@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ملف تعريفي - السلاموني</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 600px;
+            margin: auto;
+            color: #333;
+            background-color: #f4f4f4;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+        }
+        .language-toggle {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        .language-toggle a {
+            margin-left: 10px;
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .language-toggle a:hover {
+            text-decoration: underline;
+        }
+        h1, h2 {
+            color: #0056b3;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+        p {
+            margin-bottom: 10px;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        ul li {
+            margin-bottom: 8px;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .rtl {
+            direction: rtl;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="profile-content">
+        <div class="language-toggle">
+            <a href="#" onclick="setLanguage('ar'); return false;">العربية</a> |
+            <a href="#" onclick="setLanguage('en'); return false;">English</a>
+        </div>
+
+        <h1 id="name-display"></h1>
+
+        <div class="section">
+            <h2 id="contact-heading"></h2>
+            <p><strong id="phone-label"></strong> <a id="phone-link" href=""></a></p>
+            <p><strong id="whatsapp-label"></strong> <a id="whatsapp-link" href="" target="_blank"></a></p>
+        </div>
+
+        <div class="section">
+            <h2 id="social-heading"></h2>
+            <p><strong id="tiktok-label"></strong> <a id="tiktok-link" href="https://www.tiktok.com/@elsalamony.web.de" target="_blank">Elsalamony (Web designer)</a></p>
+        </div>
+
+        <div class="section">
+            <h2 id="projects-heading"></h2>
+            <ul id="projects-list">
+                </ul>
+        </div>
+    </div>
+
+    <script>
+        const profileData = {
+            en: {
+                name: "Elsalamony (Web designer)",
+                contactHeading: "Contact Information",
+                phoneLabel: "Phone:",
+                whatsappLabel: "WhatsApp:",
+                whatsappText: "Chat on WhatsApp",
+                socialHeading: "Social Media",
+                tiktokLabel: "TikTok:",
+                projectsHeading: "My Web Projects (English)",
+                projects: [
+                    { name: "Website Project 1", link: "https://www.example.com/project1", description: "A modern portfolio site." },
+                    { name: "E-commerce Store", link: "https://www.example.com/store", description: "Developed a responsive online shop." },
+                    { name: "Blog Platform", link: "https://www.example.com/blog", description: "Created a custom blog with admin panel." }
+                ]
+            },
+            ar: {
+                name: "السلاموني (مصمم ويب)",
+                contactHeading: "معلومات الاتصال",
+                phoneLabel: "رقم الهاتف:",
+                whatsappLabel: "واتساب:",
+                whatsappText: "محادثة عبر الواتساب",
+                socialHeading: "وسائل التواصل الاجتماعي",
+                tiktokLabel: "تيك توك:",
+                projectsHeading: "مشاريعي على الويب (باللغة الإنجليزية)",
+                projects: [
+                    { name: "مشروع موقع ويب 1", link: "https://www.example.com/project1", description: "موقع محفظة حديث." },
+                    { name: "متجر تجارة إلكترونية", link: "https://www.example.com/store", description: "تم تطوير متجر إلكتروني متجاوب." },
+                    { name: "منصة مدونة", link: "https://www.example.com/blog", description: "تم إنشاء مدونة مخصصة مع لوحة تحكم." }
+                ]
+            }
+        };
+
+        function setLanguage(lang) {
+            const data = profileData[lang];
+            document.getElementById('name-display').textContent = data.name;
+            document.getElementById('contact-heading').textContent = data.contactHeading;
+            document.getElementById('phone-label').textContent = data.phoneLabel;
+            document.getElementById('whatsapp-label').textContent = data.whatsappLabel;
+            document.getElementById('social-heading').textContent = data.socialHeading;
+            document.getElementById('tiktok-label').textContent = data.tiktokLabel;
+            document.getElementById('projects-heading').textContent = data.projectsHeading;
+
+            // Set phone and WhatsApp links
+            const phoneNumber = '01210409575'; // Your phone number
+            const phoneNumberFull = '+201210409575'; // Full international format
+
+            document.getElementById('phone-link').href = `tel:${phoneNumberFull}`;
+            document.getElementById('phone-link').textContent = phoneNumber;
+
+            document.getElementById('whatsapp-link').href = `https://wa.me/201210409575`; // WhatsApp link without '+' or spaces
+            document.getElementById('whatsapp-link').textContent = data.whatsappText;
+
+            // Clear and re-populate projects
+            const projectsList = document.getElementById('projects-list');
+            projectsList.innerHTML = '';
+            data.projects.forEach(project => {
+                const li = document.createElement('li');
+                li.innerHTML = `<a href="${project.link}" target="_blank">${project.name}</a> - ${project.description}`;
+                projectsList.appendChild(li);
+            });
+
+            // Set text direction based on language
+            const profileContent = document.getElementById('profile-content');
+            if (lang === 'ar') {
+                profileContent.classList.add('rtl');
+            } else {
+                profileContent.classList.remove('rtl');
+            }
+        }
+
+        // Set initial language to Arabic (or English if you prefer)
+        setLanguage('ar'); // You can change this to 'en' for English default
+    </script>
+
+</body>
+</html>
