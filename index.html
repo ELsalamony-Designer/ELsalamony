@@ -5,69 +5,178 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile - Elsalamony</title>
     <style>
+        /* General Body Styling: Black & Grey Background */
         body {
             font-family: Arial, sans-serif;
             line-height: 1.6;
-            padding: 20px;
-            max-width: 600px;
-            margin: auto;
-            color: #333;
-            background-color: #f4f4f4; /* Fallback for browsers without animation support */
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            position: relative; /* Needed for absolute positioning of animated elements */
-            overflow: hidden; /* Hide anything that goes outside the body */
-            min-height: 100vh; /* Ensure body takes full height for background effect */
-            background: linear-gradient(135deg, #222222, #444444); /* Black and grey gradient */
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align items to the start (top) */
+            padding-top: 20px; /* Add some top padding */
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #1a1a1a, #333333);
+            color: white;
+            gap: 20px; /* Space between main content and game frame */
         }
+
+        /* Main Content Container (The "Frame"): Black & Grey with White Text */
         .container {
-            background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent white for content */
+            background-color: rgba(0, 0, 0, 0.8);
             padding: 30px;
             border-radius: 8px;
-            position: relative; /* Keep container above animated elements */
-            z-index: 10; /* Ensure content is on top */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            max-width: 600px;
+            width: 90%;
+            position: relative;
+            z-index: 10;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: left;
+            flex-shrink: 1; /* Allow it to shrink if needed */
         }
+
+        /* Game Frame Styling */
+        .game-frame {
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            width: 300px; /* Fixed width for the game frame */
+            min-width: 250px; /* Minimum width to ensure readability */
+            position: relative;
+            z-index: 10;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            overflow: hidden; /* Hide game elements that go outside */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex-shrink: 0; /* Prevent it from shrinking */
+            height: fit-content; /* Adjust height to content */
+        }
+
+        .game-area {
+            width: 100%;
+            height: 250px; /* Fixed height for the game area */
+            border: 1px dashed rgba(255, 255, 255, 0.3);
+            margin-top: 15px;
+            position: relative;
+            overflow: hidden; /* Crucial for keeping targets inside */
+        }
+
+        /* Game Target Styling */
+        .game-target {
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background-color: rgba(255, 69, 0, 0.9); /* Orange-red target */
+            cursor: pointer;
+            transition: transform 0.08s ease-out, background-color 0.2s ease-in-out; /* Smooth evasion and hit feedback */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 0 8px rgba(255, 69, 0, 0.6);
+        }
+        .game-target.hit {
+            background-color: rgba(0, 255, 0, 0.9); /* Green when hit */
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
+            transform: scale(1.2); /* Pop out when hit */
+        }
+        .game-target.hit-feedback {
+            animation: hitFadeOut 0.5s forwards;
+        }
+
+        @keyframes hitFadeOut {
+            to {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+        }
+
+
+        /* Headings Styling */
         h1, h2 {
-            color: #0056b3;
-            border-bottom: 2px solid #eee;
+            color: #eeeeee;
+            border-bottom: 2px solid #555555;
             padding-bottom: 5px;
             margin-bottom: 15px;
         }
+
         p {
             margin-bottom: 10px;
         }
+
         ul {
             list-style: none;
             padding: 0;
         }
+
         ul li {
             margin-bottom: 8px;
         }
+
+        /* Rainbow Link Styling */
         a {
-            color: #007bff;
+            background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             text-decoration: none;
+            font-weight: bold;
+            display: inline-block;
+            position: relative;
+            background-size: 200% 100%;
+            animation: rainbow-shift 6s linear infinite;
         }
+
         a:hover {
             text-decoration: underline;
         }
 
-        /* Animated Dot Styling */
+        /* Rainbow Animation Keyframes */
+        @keyframes rainbow-shift {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+
+        /* Animated Dot Styling (for the background that escapes mouse) */
         .animated-dot {
             position: absolute;
             width: 15px;
             height: 15px;
-            background-color: rgba(255, 0, 255, 0.7); /* Example vibrant color */
             border-radius: 50%;
-            pointer-events: none; /* Allows clicks to pass through */
-            z-index: 5; /* Below content, above background */
+            pointer-events: none;
+            z-index: 5;
             transition: transform 0.1s ease-out; /* Smooth evasion movement */
         }
 
-        /* Additional vibrant colors for the dots */
-        .animated-dot:nth-child(2n) { background-color: rgba(0, 255, 255, 0.7); }
-        .animated-dot:nth-child(3n) { background-color: rgba(255, 255, 0, 0.7); }
-        .animated-dot:nth-child(4n) { background-color: rgba(0, 255, 0, 0.7); }
+        /* Various vibrant colors for background dots */
+        .animated-dot:nth-child(6n+1) { background-color: rgba(255, 0, 255, 0.6); } /* Magenta */
+        .animated-dot:nth-child(6n+2) { background-color: rgba(0, 255, 255, 0.6); } /* Cyan */
+        .animated-dot:nth-child(6n+3) { background-color: rgba(255, 255, 0, 0.6); } /* Yellow */
+        .animated-dot:nth-child(6n+4) { background-color: rgba(0, 255, 0, 0.6); } /* Green */
+        .animated-dot:nth-child(6n+5) { background-color: rgba(255, 165, 0, 0.6); } /* Orange */
+        .animated-dot:nth-child(6n+0) { background-color: rgba(128, 0, 128, 0.6); } /* Purple */
 
+        /* Responsive adjustments */
+        @media (max-width: 1000px) {
+            body {
+                flex-direction: column; /* Stack content and game vertically */
+                align-items: center; /* Center items when stacked */
+                padding: 20px 0;
+            }
+            .container, .game-frame {
+                max-width: 90%;
+                width: auto; /* Allow content to dictate width more */
+                margin-bottom: 20px; /* Space between stacked elements */
+            }
+        }
     </style>
 </head>
 <body>
@@ -95,88 +204,198 @@
         </div>
     </div>
 
-    <script>
-        const numberOfDots = 50; // How many animated dots
-        const evasionDistance = 80; // How far dots try to move from the mouse
+    <div class="game-frame">
+        <h2>Mouse Chase!</h2>
+        <p>Score: <span id="game-score">0</span></p>
+        <div class="game-area" id="game-area">
+            </div>
+    </div>
 
-        // Create animated dots and append them to the body
-        for (let i = 0; i < numberOfDots; i++) {
+
+    <script>
+        // --- Background Animated Dots Logic ---
+        const numberOfBgDots = 40; // Moderate number of background dots
+        const bgEvasionDistance = 70; // How far background dots try to move from the mouse
+        const bgDotSpeed = 0.7; // Speed of continuous background dot movement
+
+        // Create background animated dots
+        for (let i = 0; i < numberOfBgDots; i++) {
             const dot = document.createElement('div');
             dot.classList.add('animated-dot');
-            // Random initial position
-            dot.style.left = `${Math.random() * 100}vw`;
-            dot.style.top = `${Math.random() * 100}vh`;
-            // Store initial random movement direction
-            dot.dataset.dx = (Math.random() - 0.5) * 2; // -1 to 1
-            dot.dataset.dy = (Math.random() - 0.5) * 2; // -1 to 1
+            dot.style.left = `${Math.random() * window.innerWidth}px`;
+            dot.style.top = `${Math.random() * window.innerHeight}px`;
+            dot.dataset.dx = (Math.random() - 0.5) * 2 * bgDotSpeed;
+            dot.dataset.dy = (Math.random() - 0.5) * 2 * bgDotSpeed;
+            dot.dataset.currentX = parseFloat(dot.style.left);
+            dot.dataset.currentY = parseFloat(dot.style.top);
             document.body.appendChild(dot);
         }
 
-        // Mouse move listener for evasion effect
+        let mouseX = -1000;
+        let mouseY = -1000;
+
         document.addEventListener('mousemove', (e) => {
-            const mouseX = e.clientX;
-            const mouseY = e.clientY;
-
-            document.querySelectorAll('.animated-dot').forEach(dot => {
-                const dotRect = dot.getBoundingClientRect();
-                const dotCenterX = dotRect.left + dotRect.width / 2;
-                const dotCenterY = dotRect.top + dotRect.height / 2;
-
-                const distanceX = mouseX - dotCenterX;
-                const distanceY = mouseY - dotCenterY;
-                const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
-
-                if (distance < evasionDistance) {
-                    // Calculate vector to move away from mouse
-                    const moveX = (distanceX / distance) * -1 * (evasionDistance - distance);
-                    const moveY = (distanceY / distance) * -1 * (evasionDistance - distance);
-
-                    // Apply transform for smooth movement
-                    dot.style.transform = `translate(${moveX}px, ${moveY}px)`;
-                } else {
-                    // Reset transform if mouse is far away
-                    dot.style.transform = `translate(0, 0)`;
-                }
-            });
+            mouseX = e.clientX;
+            mouseY = e.clientY;
         });
 
-        // Continuous random movement for dots when not evading
-        function animateDots() {
+        function animateBgDots() {
             document.querySelectorAll('.animated-dot').forEach(dot => {
-                let currentLeft = parseFloat(dot.style.left) / 100 * window.innerWidth;
-                let currentTop = parseFloat(dot.style.top) / 100 * window.innerHeight;
-
+                let currentX = parseFloat(dot.dataset.currentX);
+                let currentY = parseFloat(dot.dataset.currentY);
                 let dx = parseFloat(dot.dataset.dx);
                 let dy = parseFloat(dot.dataset.dy);
 
-                // Simple boundary check and bounce
-                if (currentLeft + dx < 0 || currentLeft + dx > window.innerWidth) {
+                const distanceX = mouseX - currentX;
+                const distanceY = mouseY - currentY;
+                const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+
+                let transformX = 0;
+                let transformY = 0;
+
+                if (distance < bgEvasionDistance) {
+                    const repulsionForce = (bgEvasionDistance - distance) / bgEvasionDistance;
+                    transformX = (distanceX / distance) * -1 * bgEvasionDistance * repulsionForce;
+                    transformY = (distanceY / distance) * -1 * bgEvasionDistance * repulsionForce;
+                }
+
+                currentX += dx;
+                currentY += dy;
+
+                if (currentX < 0 || currentX > window.innerWidth) {
                     dx *= -1;
                     dot.dataset.dx = dx;
                 }
-                if (currentTop + dy < 0 || currentTop + dy > window.innerHeight) {
+                if (currentY < 0 || currentY > window.innerHeight) {
                     dy *= -1;
                     dot.dataset.dy = dy;
                 }
 
-                // Update position (without direct transform for natural movement when not evading)
-                dot.style.left = `${currentLeft + dx}px`;
-                dot.style.top = `${currentTop + dy}px`;
+                dot.dataset.currentX = currentX;
+                dot.dataset.currentY = currentY;
+
+                dot.style.left = `${currentX}px`;
+                dot.style.top = `${currentY}px`;
+                dot.style.transform = `translate(${transformX}px, ${transformY}px)`;
             });
-            requestAnimationFrame(animateDots);
+            requestAnimationFrame(animateBgDots);
+        }
+        animateBgDots();
+
+        // --- Simple Game Logic ---
+        const gameArea = document.getElementById('game-area');
+        const gameScoreDisplay = document.getElementById('game-score');
+        let score = 0;
+        const targetEvasionDistance = 80; // How far game targets evade
+        const targetSpeed = 1.5; // Speed of game targets
+
+        function createTarget() {
+            const target = document.createElement('div');
+            target.classList.add('game-target');
+            // Random initial position within game-area
+            const maxX = gameArea.offsetWidth - 25; // 25 is target width
+            const maxY = gameArea.offsetHeight - 25; // 25 is target height
+            const startX = Math.random() * maxX;
+            const startY = Math.random() * maxY;
+
+            target.style.left = `${startX}px`;
+            target.style.top = `${startY}px`;
+            target.dataset.currentX = startX;
+            target.dataset.currentY = startY;
+
+            // Random initial movement direction for game targets
+            target.dataset.dx = (Math.random() - 0.5) * 2 * targetSpeed;
+            target.dataset.dy = (Math.random() - 0.5) * 2 * targetSpeed;
+
+            target.textContent = '🎯'; // Emoji for target
+
+            target.addEventListener('click', () => {
+                score++;
+                gameScoreDisplay.textContent = score;
+                target.classList.add('hit');
+                // Remove after a short animation
+                setTimeout(() => {
+                    target.remove();
+                    createTarget(); // Create a new target
+                }, 200);
+            });
+            gameArea.appendChild(target);
         }
 
-        // Start the continuous animation
-        animateDots();
+        // Mouse move listener for game targets
+        gameArea.addEventListener('mousemove', (e) => {
+            const gameMouseX = e.offsetX; // Mouse X relative to gameArea
+            const gameMouseY = e.offsetY; // Mouse Y relative to gameArea
 
-        // Set phone and WhatsApp links (English only)
-        const phoneNumber = '01210409575'; // Your phone number
-        const phoneNumberFull = '+201210409575'; // Full international format
+            gameArea.querySelectorAll('.game-target').forEach(target => {
+                const targetRect = target.getBoundingClientRect();
+                // Get target position relative to game area
+                const targetCenterX = parseFloat(target.dataset.currentX) + targetRect.width / 2;
+                const targetCenterY = parseFloat(target.dataset.currentY) + targetRect.height / 2;
+
+                const distanceX = gameMouseX - targetCenterX;
+                const distanceY = gameMouseY - targetCenterY;
+                const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+
+                if (distance < targetEvasionDistance) {
+                    const repulsionForce = (targetEvasionDistance - distance) / targetEvasionDistance;
+                    const moveX = (distanceX / distance) * -1 * targetEvasionDistance * repulsionForce;
+                    const moveY = (distanceY / distance) * -1 * targetEvasionDistance * repulsionForce;
+                    target.style.transform = `translate(${moveX}px, ${moveY}px)`;
+                } else {
+                    target.style.transform = `translate(0, 0)`;
+                }
+            });
+        });
+
+        // Animation loop for game targets
+        function animateGameTargets() {
+            gameArea.querySelectorAll('.game-target').forEach(target => {
+                if (target.classList.contains('hit')) return; // Don't animate hit targets
+
+                let currentX = parseFloat(target.dataset.currentX);
+                let currentY = parseFloat(target.dataset.currentY);
+                let dx = parseFloat(target.dataset.dx);
+                let dy = parseFloat(target.dataset.dy);
+
+                currentX += dx;
+                currentY += dy;
+
+                const targetWidth = target.offsetWidth;
+                const targetHeight = target.offsetHeight;
+
+                // Bounce off game area boundaries
+                if (currentX < 0 || currentX + targetWidth > gameArea.offsetWidth) {
+                    dx *= -1;
+                    target.dataset.dx = dx;
+                }
+                if (currentY < 0 || currentY + targetHeight > gameArea.offsetHeight) {
+                    dy *= -1;
+                    target.dataset.dy = dy;
+                }
+
+                target.dataset.currentX = currentX;
+                target.dataset.currentY = currentY;
+
+                target.style.left = `${currentX}px`;
+                target.style.top = `${currentY}px`;
+            });
+            requestAnimationFrame(animateGameTargets);
+        }
+
+        // Start the game by creating initial target
+        createTarget();
+        animateGameTargets(); // Start animating game targets
+
+
+        // --- General Profile Page Links Setup ---
+        const phoneNumber = '01210409575';
+        const phoneNumberFull = '+201210409575';
 
         document.getElementById('phone-link').href = `tel:${phoneNumberFull}`;
         document.getElementById('phone-link').textContent = phoneNumber;
 
-        document.getElementById('whatsapp-link').href = `https://wa.me/201210409575`; // WhatsApp link without '+' or spaces
+        document.getElementById('whatsapp-link').href = `https://wa.me/201210409575`;
         document.getElementById('whatsapp-link').textContent = "Chat on WhatsApp";
     </script>
 
