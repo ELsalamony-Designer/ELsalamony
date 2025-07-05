@@ -7,99 +7,124 @@
     <style>
         /* General Body Styling: Black & Grey Background */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* More modern font */
             line-height: 1.6;
             padding: 0;
             margin: 0;
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* Align items to the start (top) */
-            padding-top: 20px; /* Add some top padding */
+            align-items: flex-start;
+            padding-top: 20px;
             position: relative;
             overflow: hidden;
-            background: linear-gradient(135deg, #1a1a1a, #333333);
+            background: linear-gradient(135deg, #0a0a0a, #222222); /* Darker black and grey gradient */
             color: white;
-            gap: 20px; /* Space between main content and game frame */
+            gap: 30px; /* More space between main content and game frame */
         }
 
         /* Main Content Container (The "Frame"): Black & Grey with White Text */
         .container {
-            background-color: rgba(0, 0, 0, 0.8);
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-            max-width: 600px;
+            background-color: rgba(0, 0, 0, 0.85); /* Slightly less transparent black */
+            padding: 35px; /* More padding */
+            border-radius: 12px; /* Softer corners */
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6); /* Stronger, softer shadow */
+            max-width: 650px; /* Slightly wider */
             width: 90%;
             position: relative;
             z-index: 10;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.08); /* More subtle white border */
             text-align: left;
-            flex-shrink: 1; /* Allow it to shrink if needed */
+            flex-shrink: 1;
         }
 
         /* Game Frame Styling */
         .game-frame {
-            background-color: rgba(0, 0, 0, 0.8);
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-            width: 300px; /* Fixed width for the game frame */
-            min-width: 250px; /* Minimum width to ensure readability */
+            background-color: rgba(0, 0, 0, 0.85);
+            padding: 25px; /* More padding */
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+            width: 350px; /* Wider game frame */
+            min-width: 300px;
             position: relative;
             z-index: 10;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             text-align: center;
-            overflow: hidden; /* Hide game elements that go outside */
+            overflow: hidden;
             display: flex;
             flex-direction: column;
             align-items: center;
-            flex-shrink: 0; /* Prevent it from shrinking */
-            height: fit-content; /* Adjust height to content */
+            flex-shrink: 0;
+            height: fit-content;
         }
 
         .game-area {
             width: 100%;
-            height: 250px; /* Fixed height for the game area */
-            border: 1px dashed rgba(255, 255, 255, 0.3);
-            margin-top: 15px;
+            height: 300px; /* Taller game area */
+            background-color: rgba(0, 0, 0, 0.6); /* Darker game area background */
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-top: 20px;
             position: relative;
-            overflow: hidden; /* Crucial for keeping targets inside */
+            overflow: hidden;
+            cursor: crosshair; /* Indicate clickable area */
         }
 
-        /* Game Target Styling */
+        /* Game Target Styling (more professional look) */
         .game-target {
             position: absolute;
-            width: 25px;
-            height: 25px;
+            width: 40px; /* Larger targets */
+            height: 40px;
             border-radius: 50%;
-            background-color: rgba(255, 69, 0, 0.9); /* Orange-red target */
+            background-color: #e74c3c; /* Flat UI red */
+            box-shadow: 0 0 15px rgba(231, 76, 60, 0.8), inset 0 0 10px rgba(255, 255, 255, 0.5); /* Glow and inner highlight */
             cursor: pointer;
-            transition: transform 0.08s ease-out, background-color 0.2s ease-in-out; /* Smooth evasion and hit feedback */
+            transition: transform 0.1s ease-out, background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 14px;
+            font-size: 20px;
             font-weight: bold;
             color: white;
-            box-shadow: 0 0 8px rgba(255, 69, 0, 0.6);
+            user-select: none; /* Prevent text selection */
+        }
+        .game-target:hover {
+            transform: scale(1.1); /* Slightly grow on hover */
         }
         .game-target.hit {
-            background-color: rgba(0, 255, 0, 0.9); /* Green when hit */
-            box-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
-            transform: scale(1.2); /* Pop out when hit */
-        }
-        .game-target.hit-feedback {
-            animation: hitFadeOut 0.5s forwards;
+            background-color: #2ecc71; /* Flat UI green when hit */
+            box-shadow: 0 0 20px rgba(46, 204, 113, 1), inset 0 0 10px rgba(255, 255, 255, 0.7);
+            animation: hitPopFade 0.3s forwards; /* New hit animation */
         }
 
-        @keyframes hitFadeOut {
-            to {
-                opacity: 0;
-                transform: scale(0.5);
-            }
+        /* Hit animation keyframes */
+        @keyframes hitPopFade {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.8; }
+            100% { transform: scale(0.5); opacity: 0; }
         }
 
+        /* Game UI */
+        #game-messages {
+            color: #f1c40f; /* Yellow for messages */
+            font-size: 1.1em;
+            margin-top: 10px;
+            min-height: 25px; /* Prevent layout shift */
+        }
+        #game-start-btn {
+            background-color: #3498db; /* Blue button */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 15px;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+        #game-start-btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
 
         /* Headings Styling */
         h1, h2 {
@@ -122,7 +147,7 @@
             margin-bottom: 8px;
         }
 
-        /* Rainbow Link Styling */
+        /* Rainbow Link Styling - SMOOTH */
         a {
             background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
             -webkit-background-clip: text;
@@ -131,8 +156,8 @@
             font-weight: bold;
             display: inline-block;
             position: relative;
-            background-size: 200% 100%;
-            animation: rainbow-shift 6s linear infinite;
+            background-size: 400% 100%; /* Wider background for smoother shift */
+            animation: rainbow-shift 12s linear infinite; /* Slower, smoother animation */
         }
 
         a:hover {
@@ -148,33 +173,33 @@
         /* Animated Dot Styling (for the background that escapes mouse) */
         .animated-dot {
             position: absolute;
-            width: 15px;
-            height: 15px;
+            width: 18px; /* Slightly larger for glow effect */
+            height: 18px;
             border-radius: 50%;
             pointer-events: none;
             z-index: 5;
             transition: transform 0.1s ease-out; /* Smooth evasion movement */
         }
 
-        /* Various vibrant colors for background dots */
-        .animated-dot:nth-child(6n+1) { background-color: rgba(255, 0, 255, 0.6); } /* Magenta */
-        .animated-dot:nth-child(6n+2) { background-color: rgba(0, 255, 255, 0.6); } /* Cyan */
-        .animated-dot:nth-child(6n+3) { background-color: rgba(255, 255, 0, 0.6); } /* Yellow */
-        .animated-dot:nth-child(6n+4) { background-color: rgba(0, 255, 0, 0.6); } /* Green */
-        .animated-dot:nth-child(6n+5) { background-color: rgba(255, 165, 0, 0.6); } /* Orange */
-        .animated-dot:nth-child(6n+0) { background-color: rgba(128, 0, 128, 0.6); } /* Purple */
+        /* Various vibrant colors for background dots with GLOW */
+        .animated-dot:nth-child(6n+1) { background-color: rgba(255, 0, 255, 0.7); box-shadow: 0 0 12px rgba(255, 0, 255, 0.9); } /* Magenta Glow */
+        .animated-dot:nth-child(6n+2) { background-color: rgba(0, 255, 255, 0.7); box-shadow: 0 0 12px rgba(0, 255, 255, 0.9); } /* Cyan Glow */
+        .animated-dot:nth-child(6n+3) { background-color: rgba(255, 255, 0, 0.7); box-shadow: 0 0 12px rgba(255, 255, 0, 0.9); } /* Yellow Glow */
+        .animated-dot:nth-child(6n+4) { background-color: rgba(0, 255, 0, 0.7); box-shadow: 0 0 12px rgba(0, 255, 0, 0.9); } /* Green Glow */
+        .animated-dot:nth-child(6n+5) { background-color: rgba(255, 165, 0, 0.7); box-shadow: 0 0 12px rgba(255, 165, 0, 0.9); } /* Orange Glow */
+        .animated-dot:nth-child(6n+0) { background-color: rgba(128, 0, 128, 0.7); box-shadow: 0 0 12px rgba(128, 0, 128, 0.9); } /* Purple Glow */
 
         /* Responsive adjustments */
         @media (max-width: 1000px) {
             body {
-                flex-direction: column; /* Stack content and game vertically */
-                align-items: center; /* Center items when stacked */
+                flex-direction: column;
+                align-items: center;
                 padding: 20px 0;
             }
             .container, .game-frame {
                 max-width: 90%;
-                width: auto; /* Allow content to dictate width more */
-                margin-bottom: 20px; /* Space between stacked elements */
+                width: auto;
+                margin-bottom: 20px;
             }
         }
     </style>
@@ -205,8 +230,10 @@
     </div>
 
     <div class="game-frame">
-        <h2>Mouse Chase!</h2>
-        <p>Score: <span id="game-score">0</span></p>
+        <h2>Target Shooter!</h2>
+        <p>Score: <span id="game-score">0</span> | Time: <span id="game-timer">0</span>s</p>
+        <div id="game-messages">Click "Start Game" to begin!</div>
+        <button id="game-start-btn">Start Game</button>
         <div class="game-area" id="game-area">
             </div>
     </div>
@@ -214,9 +241,9 @@
 
     <script>
         // --- Background Animated Dots Logic ---
-        const numberOfBgDots = 40; // Moderate number of background dots
-        const bgEvasionDistance = 70; // How far background dots try to move from the mouse
-        const bgDotSpeed = 0.7; // Speed of continuous background dot movement
+        const numberOfBgDots = 50; // Increased moderate number
+        const bgEvasionDistance = 80; // Slightly larger evasion distance
+        const bgDotSpeed = 0.5; // Slightly slower, smoother speed
 
         // Create background animated dots
         for (let i = 0; i < numberOfBgDots; i++) {
@@ -231,8 +258,8 @@
             document.body.appendChild(dot);
         }
 
-        let mouseX = -1000;
-        let mouseY = -1000;
+        let mouseX = -1000; // Initialize off-screen
+        let mouseY = -1000; // Initialize off-screen
 
         document.addEventListener('mousemove', (e) => {
             mouseX = e.clientX;
@@ -280,21 +307,69 @@
             });
             requestAnimationFrame(animateBgDots);
         }
-        animateBgDots();
+        animateBgDots(); // Start the background dot animation
 
-        // --- Simple Game Logic ---
+        // --- Professional Game Logic: Target Shooter ---
         const gameArea = document.getElementById('game-area');
         const gameScoreDisplay = document.getElementById('game-score');
+        const gameTimerDisplay = document.getElementById('game-timer');
+        const gameMessages = document.getElementById('game-messages');
+        const gameStartButton = document.getElementById('game-start-btn');
+
         let score = 0;
-        const targetEvasionDistance = 80; // How far game targets evade
-        const targetSpeed = 1.5; // Speed of game targets
+        let timeLeft = 30; // Game duration in seconds
+        let gameInterval;
+        let targetCreationInterval;
+        let gameActive = false;
+
+        const targetSettings = {
+            minSpeed: 1,
+            maxSpeed: 3,
+            spawnInterval: 1000, // Milliseconds between target spawns
+            evasionDistance: 100, // Targets evade mouse
+            targetSize: 40 // Matches CSS
+        };
+
+        function startGame() {
+            if (gameActive) return; // Prevent starting multiple games
+            gameActive = true;
+            score = 0;
+            timeLeft = 30;
+            gameScoreDisplay.textContent = score;
+            gameTimerDisplay.textContent = timeLeft;
+            gameMessages.textContent = "Go! Shoot the targets!";
+            gameStartButton.disabled = true;
+
+            // Clear any existing targets
+            gameArea.innerHTML = '';
+
+            gameInterval = setInterval(() => {
+                timeLeft--;
+                gameTimerDisplay.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+
+            targetCreationInterval = setInterval(createTarget, targetSettings.spawnInterval);
+        }
+
+        function endGame() {
+            gameActive = false;
+            clearInterval(gameInterval);
+            clearInterval(targetCreationInterval);
+            gameMessages.textContent = `Game Over! Your final score: ${score}`;
+            gameStartButton.disabled = false;
+            // Remove all targets
+            gameArea.innerHTML = '';
+        }
 
         function createTarget() {
             const target = document.createElement('div');
             target.classList.add('game-target');
-            // Random initial position within game-area
-            const maxX = gameArea.offsetWidth - 25; // 25 is target width
-            const maxY = gameArea.offsetHeight - 25; // 25 is target height
+
+            const maxX = gameArea.offsetWidth - targetSettings.targetSize;
+            const maxY = gameArea.offsetHeight - targetSettings.targetSize;
             const startX = Math.random() * maxX;
             const startY = Math.random() * maxY;
 
@@ -303,90 +378,90 @@
             target.dataset.currentX = startX;
             target.dataset.currentY = startY;
 
-            // Random initial movement direction for game targets
-            target.dataset.dx = (Math.random() - 0.5) * 2 * targetSpeed;
-            target.dataset.dy = (Math.random() - 0.5) * 2 * targetSpeed;
+            const speed = Math.random() * (targetSettings.maxSpeed - targetSettings.minSpeed) + targetSettings.minSpeed;
+            target.dataset.dx = (Math.random() - 0.5) * 2 * speed;
+            target.dataset.dy = (Math.random() - 0.5) * 2 * speed;
 
-            target.textContent = '🎯'; // Emoji for target
+            target.textContent = '◉'; // A simple dot for the target
 
             target.addEventListener('click', () => {
-                score++;
+                if (!gameActive) return;
+                score += 10; // More points per hit
                 gameScoreDisplay.textContent = score;
                 target.classList.add('hit');
-                // Remove after a short animation
+                // Remove after animation and create new
                 setTimeout(() => {
                     target.remove();
-                    createTarget(); // Create a new target
-                }, 200);
+                    // Don't auto-create a new one immediately after hit,
+                    // rely on the interval for continuous spawning
+                }, 300); // Shorter duration for hit animation
             });
             gameArea.appendChild(target);
         }
 
-        // Mouse move listener for game targets
+        // Mouse move listener for game targets' evasion
         gameArea.addEventListener('mousemove', (e) => {
-            const gameMouseX = e.offsetX; // Mouse X relative to gameArea
-            const gameMouseY = e.offsetY; // Mouse Y relative to gameArea
+            const gameMouseX = e.offsetX;
+            const gameMouseY = e.offsetY;
 
             gameArea.querySelectorAll('.game-target').forEach(target => {
-                const targetRect = target.getBoundingClientRect();
-                // Get target position relative to game area
-                const targetCenterX = parseFloat(target.dataset.currentX) + targetRect.width / 2;
-                const targetCenterY = parseFloat(target.dataset.currentY) + targetRect.height / 2;
+                const targetCenterX = parseFloat(target.dataset.currentX) + targetSettings.targetSize / 2;
+                const targetCenterY = parseFloat(target.dataset.currentY) + targetSettings.targetSize / 2;
 
                 const distanceX = gameMouseX - targetCenterX;
                 const distanceY = gameMouseY - targetCenterY;
                 const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
 
-                if (distance < targetEvasionDistance) {
-                    const repulsionForce = (targetEvasionDistance - distance) / targetEvasionDistance;
-                    const moveX = (distanceX / distance) * -1 * targetEvasionDistance * repulsionForce;
-                    const moveY = (distanceY / distance) * -1 * targetEvasionDistance * repulsionForce;
-                    target.style.transform = `translate(${moveX}px, ${moveY}px)`;
-                } else {
-                    target.style.transform = `translate(0, 0)`;
+                let transformX = 0;
+                let transformY = 0;
+
+                if (distance < targetSettings.evasionDistance) {
+                    const repulsionForce = (targetSettings.evasionDistance - distance) / targetSettings.evasionDistance;
+                    transformX = (distanceX / distance) * -1 * targetSettings.evasionDistance * repulsionForce * 0.5; // Reduced evasion for playability
+                    transformY = (distanceY / distance) * -1 * targetSettings.evasionDistance * repulsionForce * 0.5;
                 }
+                target.style.transform = `translate(${transformX}px, ${transformY}px)`;
             });
         });
 
         // Animation loop for game targets
         function animateGameTargets() {
-            gameArea.querySelectorAll('.game-target').forEach(target => {
-                if (target.classList.contains('hit')) return; // Don't animate hit targets
+            if (gameActive) {
+                gameArea.querySelectorAll('.game-target').forEach(target => {
+                    // Only move targets that haven't been hit
+                    if (!target.classList.contains('hit')) {
+                        let currentX = parseFloat(target.dataset.currentX);
+                        let currentY = parseFloat(target.dataset.currentY);
+                        let dx = parseFloat(target.dataset.dx);
+                        let dy = parseFloat(target.dataset.dy);
 
-                let currentX = parseFloat(target.dataset.currentX);
-                let currentY = parseFloat(target.dataset.currentY);
-                let dx = parseFloat(target.dataset.dx);
-                let dy = parseFloat(target.dataset.dy);
+                        currentX += dx;
+                        currentY += dy;
 
-                currentX += dx;
-                currentY += dy;
+                        // Bounce off game area boundaries
+                        if (currentX < 0 || currentX + targetSettings.targetSize > gameArea.offsetWidth) {
+                            dx *= -1;
+                            target.dataset.dx = dx;
+                        }
+                        if (currentY < 0 || currentY + targetSettings.targetSize > gameArea.offsetHeight) {
+                            dy *= -1;
+                            target.dataset.dy = dy;
+                        }
 
-                const targetWidth = target.offsetWidth;
-                const targetHeight = target.offsetHeight;
+                        target.dataset.currentX = currentX;
+                        target.dataset.currentY = currentY;
 
-                // Bounce off game area boundaries
-                if (currentX < 0 || currentX + targetWidth > gameArea.offsetWidth) {
-                    dx *= -1;
-                    target.dataset.dx = dx;
-                }
-                if (currentY < 0 || currentY + targetHeight > gameArea.offsetHeight) {
-                    dy *= -1;
-                    target.dataset.dy = dy;
-                }
-
-                target.dataset.currentX = currentX;
-                target.dataset.currentY = currentY;
-
-                target.style.left = `${currentX}px`;
-                target.style.top = `${currentY}px`;
-            });
+                        target.style.left = `${currentX}px`;
+                        target.style.top = `${currentY}px`;
+                    }
+                });
+            }
             requestAnimationFrame(animateGameTargets);
         }
+        animateGameTargets(); // Start the game target animation loop
 
-        // Start the game by creating initial target
-        createTarget();
-        animateGameTargets(); // Start animating game targets
-
+        // Event listener for Start Game button
+        gameStartButton.addEventListener('click', startGame);
 
         // --- General Profile Page Links Setup ---
         const phoneNumber = '01210409575';
