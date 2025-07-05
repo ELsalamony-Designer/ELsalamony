@@ -12,27 +12,20 @@
             max-width: 600px;
             margin: auto;
             color: #333;
-            background-color: #f4f4f4;
+            background-color: #f4f4f4; /* Fallback for browsers without animation support */
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: relative; /* Needed for absolute positioning of animated elements */
+            overflow: hidden; /* Hide anything that goes outside the body */
+            min-height: 100vh; /* Ensure body takes full height for background effect */
+            background: linear-gradient(135deg, #222222, #444444); /* Black and grey gradient */
         }
         .container {
-            background-color: #fff;
+            background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent white for content */
             padding: 30px;
             border-radius: 8px;
-        }
-        .language-toggle {
-            text-align: right;
-            margin-bottom: 20px;
-        }
-        .language-toggle a {
-            margin-left: 10px;
-            color: #007bff;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        .language-toggle a:hover {
-            text-decoration: underline;
+            position: relative; /* Keep container above animated elements */
+            z-index: 10; /* Ensure content is on top */
         }
         h1, h2 {
             color: #0056b3;
@@ -57,112 +50,134 @@
         a:hover {
             text-decoration: underline;
         }
-        .rtl {
-            direction: rtl;
-            text-align: right;
+
+        /* Animated Dot Styling */
+        .animated-dot {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background-color: rgba(255, 0, 255, 0.7); /* Example vibrant color */
+            border-radius: 50%;
+            pointer-events: none; /* Allows clicks to pass through */
+            z-index: 5; /* Below content, above background */
+            transition: transform 0.1s ease-out; /* Smooth evasion movement */
         }
+
+        /* Additional vibrant colors for the dots */
+        .animated-dot:nth-child(2n) { background-color: rgba(0, 255, 255, 0.7); }
+        .animated-dot:nth-child(3n) { background-color: rgba(255, 255, 0, 0.7); }
+        .animated-dot:nth-child(4n) { background-color: rgba(0, 255, 0, 0.7); }
+
     </style>
 </head>
 <body>
 
     <div class="container" id="profile-content">
-        <div class="language-toggle">
-            <a href="#" onclick="setLanguage('ar'); return false;">العربية</a> |
-            <a href="#" onclick="setLanguage('en'); return false;">English</a>
-        </div>
-
-        <h1 id="name-display"></h1>
+        <h1>Elsalamony (Web designer)</h1>
 
         <div class="section">
-            <h2 id="contact-heading"></h2>
-            <p><strong id="phone-label"></strong> <a id="phone-link" href=""></a></p>
-            <p><strong id="whatsapp-label"></strong> <a id="whatsapp-link" href="" target="_blank"></a></p>
+            <h2>Contact Information</h2>
+            <p><strong>Phone:</strong> <a id="phone-link" href="tel:+201210409575">01210409575</a></p>
+            <p><strong>WhatsApp:</strong> <a id="whatsapp-link" href="https://wa.me/201210409575" target="_blank">Chat on WhatsApp</a></p>
         </div>
 
         <div class="section">
-            <h2 id="social-heading"></h2>
-            <p><strong id="tiktok-label"></strong> <a id="tiktok-link" href="https://www.tiktok.com/@elsalamony.web.de" target="_blank">Elsalamony (Web designer)</a></p>
+            <h2>Social Media</h2>
+            <p><strong>TikTok:</strong> <a href="https://www.tiktok.com/@elsalamony.web.de" target="_blank">Elsalamony (Web designer)</a></p>
         </div>
 
         <div class="section">
-            <h2 id="projects-heading"></h2>
+            <h2>My Web Projects</h2>
             <ul id="projects-list">
-                </ul>
+                <li><a href="https://atr-egclothes.glitch.me" target="_blank">ATR-egclothes</a> - Clothes Brand Website</li>
+                <li><a href="https://elsalamony-designer.github.io/pixel-art-with-code/" target="_blank">Pixel Art By Coding🎨</a> - Getting photos by coding and the opposite</li>
+            </ul>
         </div>
     </div>
 
     <script>
-        const profileData = {
-            en: {
-                name: "Elsalamony (Web designer)",
-                contactHeading: "Contact Information",
-                phoneLabel: "Phone:",
-                whatsappLabel: "WhatsApp:",
-                whatsappText: "Chat on WhatsApp",
-                socialHeading: "Social Media",
-                tiktokLabel: "TikTok:",
-                projectsHeading: "My Web Projects",
-                projects: [
-                    { name: "ATR-egclothes", link: "https://atr-egclothes.glitch.me", description: "Clothes Brand Website" },
-                    { name: "Pixel Art By Coding🎨", link: "https://elsalamony-designer.github.io/pixel-art-with-code/", description: "Getting photos by coding and the opposite" },
-                ]
-            },
-            ar: {
-                name: "السلاموني (مصمم ويب)",
-                contactHeading: "معلومات الاتصال",
-                phoneLabel: "رقم الهاتف:",
-                whatsappLabel: "واتساب:",
-                whatsappText: "محادثة عبر الواتساب",
-                socialHeading: "وسائل التواصل الاجتماعي",
-                tiktokLabel: "تيك توك:",
-                projectsHeading: "مشاريعي على الويب",
-                projects: [
-                    { name: "ATR-egclothes", link: "https://atr-egclothes.glitch.me", description: "موقع تجاري للملابس" },
-                    { name: "Pixel Art By Coding🎨", link: "https://elsalamony-designer.github.io/pixel-art-with-code/", description: "موقع لرسم الصور بالكودات و الحصول على اكواد الصور" },
-                ]
-            }
-        };
+        const numberOfDots = 50; // How many animated dots
+        const evasionDistance = 80; // How far dots try to move from the mouse
 
-        function setLanguage(lang) {
-            const data = profileData[lang];
-            document.getElementById('name-display').textContent = data.name;
-            document.getElementById('contact-heading').textContent = data.contactHeading;
-            document.getElementById('phone-label').textContent = data.phoneLabel;
-            document.getElementById('whatsapp-label').textContent = data.whatsappLabel;
-            document.getElementById('social-heading').textContent = data.socialHeading;
-            document.getElementById('tiktok-label').textContent = data.tiktokLabel;
-            document.getElementById('projects-heading').textContent = data.projectsHeading;
-
-            // Set phone and WhatsApp links
-            const phoneNumber = '01210409575'; // Your phone number
-            const phoneNumberFull = '+201210409575'; // Full international format
-
-            document.getElementById('phone-link').href = `tel:${phoneNumberFull}`;
-            document.getElementById('phone-link').textContent = phoneNumber;
-
-            document.getElementById('whatsapp-link').href = `https://wa.me/201210409575`; // WhatsApp link without '+' or spaces
-            document.getElementById('whatsapp-link').textContent = data.whatsappText;
-
-            // Clear and re-populate projects
-            const projectsList = document.getElementById('projects-list');
-            projectsList.innerHTML = '';
-            data.projects.forEach(project => {
-                const li = document.createElement('li');
-                li.innerHTML = `<a href="${project.link}" target="_blank">${project.name}</a> - ${project.description}`;
-                projectsList.appendChild(li);
-            });
-
-            // Set text direction based on language
-            const profileContent = document.getElementById('profile-content');
-            if (lang === 'ar') {
-                profileContent.classList.add('rtl');
-            } else {
-                profileContent.classList.remove('rtl');
-            }
+        // Create animated dots and append them to the body
+        for (let i = 0; i < numberOfDots; i++) {
+            const dot = document.createElement('div');
+            dot.classList.add('animated-dot');
+            // Random initial position
+            dot.style.left = `${Math.random() * 100}vw`;
+            dot.style.top = `${Math.random() * 100}vh`;
+            // Store initial random movement direction
+            dot.dataset.dx = (Math.random() - 0.5) * 2; // -1 to 1
+            dot.dataset.dy = (Math.random() - 0.5) * 2; // -1 to 1
+            document.body.appendChild(dot);
         }
 
-        // Set initial language to Arabic (or English if you prefer)
-        setLanguage('ar'); // You can change this to 'en' for English default
+        // Mouse move listener for evasion effect
+        document.addEventListener('mousemove', (e) => {
+            const mouseX = e.clientX;
+            const mouseY = e.clientY;
+
+            document.querySelectorAll('.animated-dot').forEach(dot => {
+                const dotRect = dot.getBoundingClientRect();
+                const dotCenterX = dotRect.left + dotRect.width / 2;
+                const dotCenterY = dotRect.top + dotRect.height / 2;
+
+                const distanceX = mouseX - dotCenterX;
+                const distanceY = mouseY - dotCenterY;
+                const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+
+                if (distance < evasionDistance) {
+                    // Calculate vector to move away from mouse
+                    const moveX = (distanceX / distance) * -1 * (evasionDistance - distance);
+                    const moveY = (distanceY / distance) * -1 * (evasionDistance - distance);
+
+                    // Apply transform for smooth movement
+                    dot.style.transform = `translate(${moveX}px, ${moveY}px)`;
+                } else {
+                    // Reset transform if mouse is far away
+                    dot.style.transform = `translate(0, 0)`;
+                }
+            });
+        });
+
+        // Continuous random movement for dots when not evading
+        function animateDots() {
+            document.querySelectorAll('.animated-dot').forEach(dot => {
+                let currentLeft = parseFloat(dot.style.left) / 100 * window.innerWidth;
+                let currentTop = parseFloat(dot.style.top) / 100 * window.innerHeight;
+
+                let dx = parseFloat(dot.dataset.dx);
+                let dy = parseFloat(dot.dataset.dy);
+
+                // Simple boundary check and bounce
+                if (currentLeft + dx < 0 || currentLeft + dx > window.innerWidth) {
+                    dx *= -1;
+                    dot.dataset.dx = dx;
+                }
+                if (currentTop + dy < 0 || currentTop + dy > window.innerHeight) {
+                    dy *= -1;
+                    dot.dataset.dy = dy;
+                }
+
+                // Update position (without direct transform for natural movement when not evading)
+                dot.style.left = `${currentLeft + dx}px`;
+                dot.style.top = `${currentTop + dy}px`;
+            });
+            requestAnimationFrame(animateDots);
+        }
+
+        // Start the continuous animation
+        animateDots();
+
+        // Set phone and WhatsApp links (English only)
+        const phoneNumber = '01210409575'; // Your phone number
+        const phoneNumberFull = '+201210409575'; // Full international format
+
+        document.getElementById('phone-link').href = `tel:${phoneNumberFull}`;
+        document.getElementById('phone-link').textContent = phoneNumber;
+
+        document.getElementById('whatsapp-link').href = `https://wa.me/201210409575`; // WhatsApp link without '+' or spaces
+        document.getElementById('whatsapp-link').textContent = "Chat on WhatsApp";
     </script>
 
 </body>
