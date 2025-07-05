@@ -66,42 +66,51 @@
             margin-top: 20px;
             position: relative;
             overflow: hidden;
-            cursor: crosshair; /* Indicate clickable area */
+            display: grid; /* Use grid for laying out game targets */
+            grid-template-columns: repeat(3, 1fr); /* 3 columns */
+            grid-template-rows: repeat(3, 1fr); /* 3 rows */
+            gap: 10px; /* Space between grid items */
+            padding: 10px;
+            box-sizing: border-box; /* Include padding in width/height */
         }
 
-        /* Game Target Styling (more professional look) */
-        .game-target {
-            position: absolute;
-            width: 40px; /* Larger targets */
-            height: 40px;
+        /* Game Target (Memory Ball) Styling */
+        .memory-ball {
+            width: 100%; /* Fill grid cell */
+            height: 100%; /* Fill grid cell */
             border-radius: 50%;
-            background-color: #e74c3c; /* Flat UI red */
-            box-shadow: 0 0 15px rgba(231, 76, 60, 0.8), inset 0 0 10px rgba(255, 255, 255, 0.5); /* Glow and inner highlight */
+            background-color: #34495e; /* Default grey color when not active */
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.5); /* Subtle shadow */
             cursor: pointer;
-            transition: transform 0.1s ease-out, background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, transform 0.1s ease-out;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 20px;
-            font-weight: bold;
-            color: white;
-            user-select: none; /* Prevent text selection */
-        }
-        .game-target:hover {
-            transform: scale(1.1); /* Slightly grow on hover */
-        }
-        .game-target.hit {
-            background-color: #2ecc71; /* Flat UI green when hit */
-            box-shadow: 0 0 20px rgba(46, 204, 113, 1), inset 0 0 10px rgba(255, 255, 255, 0.7);
-            animation: hitPopFade 0.3s forwards; /* New hit animation */
+            font-size: 24px;
+            color: white; /* Text/number color */
+            user-select: none;
         }
 
-        /* Hit animation keyframes */
-        @keyframes hitPopFade {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.3); opacity: 0.8; }
-            100% { transform: scale(0.5); opacity: 0; }
+        .memory-ball.active {
+            animation: pulseGlow 0.8s ease-out forwards; /* Glow when shown in sequence */
         }
+
+        .memory-ball.correct {
+            background-color: #2ecc71; /* Green when correctly clicked */
+            box-shadow: 0 0 15px rgba(46, 204, 113, 1);
+        }
+
+        .memory-ball.wrong {
+            background-color: #e74c3c; /* Red when incorrectly clicked */
+            box-shadow: 0 0 15px rgba(231, 76, 60, 1);
+        }
+
+        @keyframes pulseGlow {
+            0% { transform: scale(1); opacity: 1; box-shadow: 0 0 8px rgba(0, 0, 0, 0.5); }
+            50% { transform: scale(1.1); opacity: 1; box-shadow: 0 0 25px currentColor; } /* Glow with its own color */
+            100% { transform: scale(1); opacity: 1; box-shadow: 0 0 8px rgba(0, 0, 0, 0.5); }
+        }
+
 
         /* Game UI */
         #game-messages {
@@ -125,6 +134,11 @@
             background-color: #2980b9;
             transform: translateY(-2px);
         }
+        #game-start-btn:disabled {
+            background-color: #666;
+            cursor: not-allowed;
+        }
+
 
         /* Headings Styling */
         h1, h2 {
@@ -230,9 +244,9 @@
     </div>
 
     <div class="game-frame">
-        <h2>Target Shooter!</h2>
-        <p>Score: <span id="game-score">0</span> | Time: <span id="game-timer">0</span>s</p>
-        <div id="game-messages">Click "Start Game" to begin!</div>
+        <h2>Color Sequence Memory</h2>
+        <p>Level: <span id="game-level">1</span> | Score: <span id="game-score">0</span></p>
+        <div id="game-messages">Remember the sequence!</div>
         <button id="game-start-btn">Start Game</button>
         <div class="game-area" id="game-area">
             </div>
@@ -240,12 +254,11 @@
 
 
     <script>
-        // --- Background Animated Dots Logic ---
-        const numberOfBgDots = 50; // Increased moderate number
-        const bgEvasionDistance = 80; // Slightly larger evasion distance
-        const bgDotSpeed = 0.5; // Slightly slower, smoother speed
+        // --- Background Animated Dots Logic (Unchanged) ---
+        const numberOfBgDots = 50;
+        const bgEvasionDistance = 80;
+        const bgDotSpeed = 0.5;
 
-        // Create background animated dots
         for (let i = 0; i < numberOfBgDots; i++) {
             const dot = document.createElement('div');
             dot.classList.add('animated-dot');
@@ -258,8 +271,8 @@
             document.body.appendChild(dot);
         }
 
-        let mouseX = -1000; // Initialize off-screen
-        let mouseY = -1000; // Initialize off-screen
+        let mouseX = -1000;
+        let mouseY = -1000;
 
         document.addEventListener('mousemove', (e) => {
             mouseX = e.clientX;
@@ -307,161 +320,159 @@
             });
             requestAnimationFrame(animateBgDots);
         }
-        animateBgDots(); // Start the background dot animation
+        animateBgDots();
 
-        // --- Professional Game Logic: Target Shooter ---
+        // --- Color Sequence Memory Game Logic ---
         const gameArea = document.getElementById('game-area');
+        const gameLevelDisplay = document.getElementById('game-level');
         const gameScoreDisplay = document.getElementById('game-score');
-        const gameTimerDisplay = document.getElementById('game-timer');
         const gameMessages = document.getElementById('game-messages');
         const gameStartButton = document.getElementById('game-start-btn');
 
-        let score = 0;
-        let timeLeft = 30; // Game duration in seconds
-        let gameInterval;
-        let targetCreationInterval;
         let gameActive = false;
+        let currentLevel = 1;
+        let score = 0;
+        let sequence = [];
+        let playerSequence = [];
+        let canClick = false;
 
-        const targetSettings = {
-            minSpeed: 1,
-            maxSpeed: 3,
-            spawnInterval: 1000, // Milliseconds between target spawns
-            evasionDistance: 100, // Targets evade mouse
-            targetSize: 40 // Matches CSS
-        };
+        // Array of colors for the memory balls (matching glow effect)
+        const ballColors = [
+            '#FF00FF', // Magenta
+            '#00FFFF', // Cyan
+            '#FFFF00', // Yellow
+            '#00FF00', // Green
+            '#FFA500', // Orange
+            '#800080'  // Purple
+        ];
 
         function startGame() {
-            if (gameActive) return; // Prevent starting multiple games
+            if (gameActive) return;
             gameActive = true;
+            currentLevel = 1;
             score = 0;
-            timeLeft = 30;
+            gameLevelDisplay.textContent = currentLevel;
             gameScoreDisplay.textContent = score;
-            gameTimerDisplay.textContent = timeLeft;
-            gameMessages.textContent = "Go! Shoot the targets!";
+            gameMessages.textContent = "Watch the sequence!";
             gameStartButton.disabled = true;
-
-            // Clear any existing targets
-            gameArea.innerHTML = '';
-
-            gameInterval = setInterval(() => {
-                timeLeft--;
-                gameTimerDisplay.textContent = timeLeft;
-                if (timeLeft <= 0) {
-                    endGame();
-                }
-            }, 1000);
-
-            targetCreationInterval = setInterval(createTarget, targetSettings.spawnInterval);
+            resetGameArea();
+            generateSequence();
         }
 
-        function endGame() {
-            gameActive = false;
-            clearInterval(gameInterval);
-            clearInterval(targetCreationInterval);
-            gameMessages.textContent = `Game Over! Your final score: ${score}`;
-            gameStartButton.disabled = false;
-            // Remove all targets
-            gameArea.innerHTML = '';
-        }
-
-        function createTarget() {
-            const target = document.createElement('div');
-            target.classList.add('game-target');
-
-            const maxX = gameArea.offsetWidth - targetSettings.targetSize;
-            const maxY = gameArea.offsetHeight - targetSettings.targetSize;
-            const startX = Math.random() * maxX;
-            const startY = Math.random() * maxY;
-
-            target.style.left = `${startX}px`;
-            target.style.top = `${startY}px`;
-            target.dataset.currentX = startX;
-            target.dataset.currentY = startY;
-
-            const speed = Math.random() * (targetSettings.maxSpeed - targetSettings.minSpeed) + targetSettings.minSpeed;
-            target.dataset.dx = (Math.random() - 0.5) * 2 * speed;
-            target.dataset.dy = (Math.random() - 0.5) * 2 * speed;
-
-            target.textContent = '◉'; // A simple dot for the target
-
-            target.addEventListener('click', () => {
-                if (!gameActive) return;
-                score += 10; // More points per hit
-                gameScoreDisplay.textContent = score;
-                target.classList.add('hit');
-                // Remove after animation and create new
-                setTimeout(() => {
-                    target.remove();
-                    // Don't auto-create a new one immediately after hit,
-                    // rely on the interval for continuous spawning
-                }, 300); // Shorter duration for hit animation
-            });
-            gameArea.appendChild(target);
-        }
-
-        // Mouse move listener for game targets' evasion
-        gameArea.addEventListener('mousemove', (e) => {
-            const gameMouseX = e.offsetX;
-            const gameMouseY = e.offsetY;
-
-            gameArea.querySelectorAll('.game-target').forEach(target => {
-                const targetCenterX = parseFloat(target.dataset.currentX) + targetSettings.targetSize / 2;
-                const targetCenterY = parseFloat(target.dataset.currentY) + targetSettings.targetSize / 2;
-
-                const distanceX = gameMouseX - targetCenterX;
-                const distanceY = gameMouseY - targetCenterY;
-                const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
-
-                let transformX = 0;
-                let transformY = 0;
-
-                if (distance < targetSettings.evasionDistance) {
-                    const repulsionForce = (targetSettings.evasionDistance - distance) / targetSettings.evasionDistance;
-                    transformX = (distanceX / distance) * -1 * targetSettings.evasionDistance * repulsionForce * 0.5; // Reduced evasion for playability
-                    transformY = (distanceY / distance) * -1 * targetSettings.evasionDistance * repulsionForce * 0.5;
-                }
-                target.style.transform = `translate(${transformX}px, ${transformY}px)`;
-            });
-        });
-
-        // Animation loop for game targets
-        function animateGameTargets() {
-            if (gameActive) {
-                gameArea.querySelectorAll('.game-target').forEach(target => {
-                    // Only move targets that haven't been hit
-                    if (!target.classList.contains('hit')) {
-                        let currentX = parseFloat(target.dataset.currentX);
-                        let currentY = parseFloat(target.dataset.currentY);
-                        let dx = parseFloat(target.dataset.dx);
-                        let dy = parseFloat(target.dataset.dy);
-
-                        currentX += dx;
-                        currentY += dy;
-
-                        // Bounce off game area boundaries
-                        if (currentX < 0 || currentX + targetSettings.targetSize > gameArea.offsetWidth) {
-                            dx *= -1;
-                            target.dataset.dx = dx;
-                        }
-                        if (currentY < 0 || currentY + targetSettings.targetSize > gameArea.offsetHeight) {
-                            dy *= -1;
-                            target.dataset.dy = dy;
-                        }
-
-                        target.dataset.currentX = currentX;
-                        target.dataset.currentY = currentY;
-
-                        target.style.left = `${currentX}px`;
-                        target.style.top = `${currentY}px`;
-                    }
-                });
+        function resetGameArea() {
+            gameArea.innerHTML = ''; // Clear existing balls
+            // Create 9 fixed memory balls in a 3x3 grid
+            for (let i = 0; i < 9; i++) {
+                const ball = document.createElement('div');
+                ball.classList.add('memory-ball');
+                ball.dataset.index = i; // Store index for identification
+                ball.addEventListener('click', handleBallClick);
+                gameArea.appendChild(ball);
             }
-            requestAnimationFrame(animateGameTargets);
         }
-        animateGameTargets(); // Start the game target animation loop
+
+        function generateSequence() {
+            sequence = [];
+            playerSequence = [];
+            canClick = false;
+            gameMessages.textContent = "Watch the sequence...";
+
+            const numBallsInSequence = Math.min(currentLevel + 2, 9); // Sequence length increases with level, max 9
+            const allBalls = Array.from(gameArea.children);
+
+            // Temporarily disable clicks during sequence display
+            allBalls.forEach(ball => ball.style.pointerEvents = 'none');
+
+            // Generate random sequence of unique ball indices
+            let availableIndices = Array.from({length: 9}, (_, i) => i); // [0, 1, ..., 8]
+            for (let i = 0; i < numBallsInSequence; i++) {
+                const randomIndex = Math.floor(Math.random() * availableIndices.length);
+                const chosenIndex = availableIndices.splice(randomIndex, 1)[0]; // Remove chosen from available
+                sequence.push(chosenIndex);
+            }
+
+            displaySequence(0);
+        }
+
+        function displaySequence(index) {
+            if (index < sequence.length) {
+                const ballIndex = sequence[index];
+                const ball = gameArea.children[ballIndex];
+                const color = ballColors[ballIndex % ballColors.length]; // Cycle through colors
+
+                ball.style.backgroundColor = color;
+                ball.style.boxShadow = `0 0 25px ${color}`; // Strong glow
+                ball.classList.add('active'); // Trigger pulse animation
+
+                setTimeout(() => {
+                    ball.style.backgroundColor = '#34495e'; // Reset to default grey
+                    ball.style.boxShadow = '0 0 8px rgba(0, 0, 0, 0.5)'; // Reset shadow
+                    ball.classList.remove('active');
+                    displaySequence(index + 1); // Show next ball in sequence
+                }, 800); // Time each ball is visible
+            } else {
+                gameMessages.textContent = "Now, repeat the sequence!";
+                canClick = true;
+                // Re-enable clicks after sequence display
+                Array.from(gameArea.children).forEach(ball => ball.style.pointerEvents = 'auto');
+            }
+        }
+
+        function handleBallClick(event) {
+            if (!canClick) return;
+
+            const clickedBall = event.target;
+            const clickedIndex = parseInt(clickedBall.dataset.index);
+
+            playerSequence.push(clickedIndex);
+
+            const expectedIndex = sequence[playerSequence.length - 1];
+
+            if (clickedIndex === expectedIndex) {
+                clickedBall.classList.add('correct');
+                clickedBall.style.backgroundColor = '#2ecc71'; // Temporarily green
+                clickedBall.style.boxShadow = '0 0 15px rgba(46, 204, 113, 1)';
+                setTimeout(() => {
+                    clickedBall.classList.remove('correct');
+                    clickedBall.style.backgroundColor = '#34495e'; // Reset
+                    clickedBall.style.boxShadow = '0 0 8px rgba(0, 0, 0, 0.5)'; // Reset
+                }, 300); // Show green for a short time
+
+                if (playerSequence.length === sequence.length) {
+                    // Sequence completed successfully
+                    score += currentLevel * 10; // More points for higher levels
+                    gameScoreDisplay.textContent = score;
+                    gameMessages.textContent = "Correct! Next level...";
+                    canClick = false; // Prevent further clicks
+                    setTimeout(() => {
+                        currentLevel++;
+                        gameLevelDisplay.textContent = currentLevel;
+                        generateSequence(); // Start next level
+                    }, 1000);
+                }
+            } else {
+                // Incorrect click
+                clickedBall.classList.add('wrong');
+                clickedBall.style.backgroundColor = '#e74c3c'; // Temporarily red
+                clickedBall.style.boxShadow = '0 0 15px rgba(231, 76, 60, 1)';
+                gameMessages.textContent = `Wrong! Game Over. Your score: ${score}`;
+                gameActive = false;
+                canClick = false; // Disable further clicks
+                gameStartButton.disabled = false;
+                setTimeout(() => {
+                    clickedBall.classList.remove('wrong');
+                    clickedBall.style.backgroundColor = '#34495e'; // Reset
+                    clickedBall.style.boxShadow = '0 0 8px rgba(0, 0, 0, 0.5)'; // Reset
+                }, 500); // Show red for a short time
+            }
+        }
 
         // Event listener for Start Game button
         gameStartButton.addEventListener('click', startGame);
+
+        // Initialize game area on load
+        resetGameArea();
+
 
         // --- General Profile Page Links Setup ---
         const phoneNumber = '01210409575';
